@@ -1,0 +1,540 @@
+{
+  "datasets": [
+    {
+      "name": "6edca260",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "--------------------------------------------checking full table\n",
+        "\n",
+        "SELECT * FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "----------------------------------------checking row/duplicates, number of row= number of unique tran_id = no duplicates\n",
+        "SELECT COUNT(*) AS num_rows,\n",
+        "       COUNT(DISTINCT transaction_id) AS user_id\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "--------------------------------------------checking NULLs in some of the columns of the dataset\n",
+        "SELECT COUNT(*) AS null_count\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`\n",
+        "WHERE transaction_id IS NULL OR transaction_date IS NULL OR transaction_time IS NULL OR transaction_qty IS NULL OR store_id IS NULL OR store_location IS NULL OR product_id IS NULL OR unit_price IS NULL OR product_category IS NULL OR product_type IS NULL OR product_detail IS NULL;\n",
+        "\n",
+        "---------------------------------------------------------------------------calculating total_revenue\n",
+        "\n",
+        "select sum(transaction_qty* unit_price) AS total_revenue from `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "SELECT SUM(transaction_qty * TRY_CAST(REPLACE(unit_price, ',', '.') AS DOUBLE)) AS Total_Revenue\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "\n",
+        "-------------------------------------------------------------------------------------calculating min,max and average price\n",
+        "select MIN(unit_price) AS lowest_price,\n",
+        "      MAX(unit_price) AS highest_price,\n",
+        "      AVG(unit_price) AS avg_price\n",
+        "      FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "select AVG (transaction_qty * unit_price) AS average_sale,\n",
+        "       MIN (transaction_qty * unit_price) AS lowest_sale,\n",
+        "       MAX (transaction_qty * unit_price) AS highest_sale\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "-------------------------------------------------------------------------------------calculating avg transaction quantity\n",
+        "SELECT AVG(transaction_qty) AS AVG_transactions\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "-----------------------------------------------------------------------------------------------------calculating total revenue per store\n",
+        "SELECT DISTINCT store_location,\n",
+        "    ROUND(SUM(transaction_qty * TRY_CAST(REPLACE(unit_price, ',','.') AS DOUBLE)),2) AS Total_Revenue\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`\n",
+        "GROUP BY store_location\n",
+        "ORDER BY Total_Revenue;\n",
+        "\n",
+        "\n",
+        "SELECT store_location,\n",
+        "       SUM(transaction_qty * unit_price) AS total_revenue\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`\n",
+        "GROUP BY store_location\n",
+        "ORDER BY total_revenue;\n",
+        "\n",
+        "SELECT\n",
+        "DAYNAME(transaction_date) AS day_name,\n",
+        "HOUR(transaction_time) AS transaction_hour,\n",
+        "DAYOFWEEK(transaction_date) AS day_of_week,\n",
+        "MONTHNAME(transaction_date) AS month_name,\n",
+        "DATE_FORMAT(transaction_time, 'HH:mm:ss') AS formatted_time,\n",
+        "YEAR(transaction_date) AS year\n",
+        "\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "---------------------------------------------------------------------------------------------------  \n",
+        "\n",
+        "SELECT CASE\n",
+        "WHEN HOUR(transaction_time) BETWEEN 0 AND 2 THEN '00:00 - 02:59.wee hours'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 3 AND 5 THEN '03:00 - 05:59.dawn hours'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 6 AND 8 THEN '06:00 - 08:59.early_morning'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 9 AND 11 THEN '09:00 - 11:59.morning'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 12 AND 14 THEN '12:00 - 14:59.afternoon'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 15 AND 17 THEN '15:00 - 17:59.late_afternoon'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 18 AND 20 THEN '18:00 - 20:59.evening'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 21 AND 23 THEN '21:00 - 23:59.night'\n",
+        "END AS time_of_day\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "\n",
+        "SELECT\n",
+        "(transaction_qty* unit_price) AS sales,\n",
+        "    CASE\n",
+        "        WHEN sales >= 5.00 THEN 'High Sale'\n",
+        "        WHEN sales >= 3.00 THEN 'Medium Sale'\n",
+        "        ELSE 'Low Sale'\n",
+        "    END AS sales_category\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "\n",
+        "SELECT\n",
+        "CASE\n",
+        "        WHEN DAYOFWEEK(transaction_date) IN (1,7)\n",
+        "        THEN 'Weekend'\n",
+        "        ELSE 'Weekday'\n",
+        "        END AS Day_Classification\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "\n",
+        "SELECT\n",
+        "CASE\n",
+        "    WHEN DAYNAME(transaction_date) IN ('Saturday', 'Sunday')\n",
+        "    THEN 'Weekend'\n",
+        "    ELSE 'Weekday'\n",
+        "END AS Day_Classification\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "SELECT\n",
+        "     transaction_time,\n",
+        "    CASE\n",
+        "        WHEN HOUR(transaction_time) BETWEEN 6 AND 11 THEN 'Morning'\n",
+        "        WHEN HOUR(transaction_time) BETWEEN 12 AND 16 THEN 'Afternoon'\n",
+        "        WHEN HOUR(transaction_time) BETWEEN 17 AND 20 THEN 'Evening'\n",
+        "        ELSE 'Night'\n",
+        "        END AS time_of_day\n",
+        "FROM `workspace`.`default`.`bright_coffee_shop`;\n",
+        "\n",
+        "\n",
+        "with CTE AS (\n",
+        "    SELECT \n",
+        "\n",
+        "transaction_qty,\n",
+        "store_id,\n",
+        "store_location,\n",
+        "product_id,\n",
+        "unit_price,\n",
+        "product_category,\n",
+        "product_type,\n",
+        "product_detail, \n",
+        "transaction_id,\n",
+        "transaction_date, \n",
+        "transaction_time,\n",
+        "sum(transaction_qty* unit_price) AS total_revenue,\n",
+        "DAYNAME(transaction_date) AS day_name,\n",
+        "HOUR(transaction_time) AS transaction_hour,\n",
+        "DAYOFWEEK(transaction_date) AS day_of_week,\n",
+        "MONTHNAME(transaction_date) AS month_name,\n",
+        "DATE_FORMAT(transaction_time, 'HH:mm:ss') AS formatted_time,\n",
+        "YEAR(transaction_date) AS year,\n",
+        "\n",
+        "CASE\n",
+        "WHEN HOUR(transaction_time) BETWEEN 0 AND 2 THEN '00:00 - 02:59.wee hours'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 3 AND 5 THEN '03:00 - 05:59.dawn hours'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 6 AND 8 THEN '06:00 - 08:59.early_morning'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 9 AND 11 THEN '09:00 - 11:59.morning'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 12 AND 14 THEN '12:00 - 14:59.afternoon'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 15 AND 17 THEN '15:00 - 17:59.late_afternoon'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 18 AND 20 THEN '18:00 - 20:59.evening'\n",
+        "WHEN HOUR(transaction_time) BETWEEN 21 AND 23 THEN '21:00 - 23:59.night'\n",
+        "END AS time_of_day,\n",
+        "\n",
+        "transaction_qty* unit_price AS sales,\n",
+        "\n",
+        "\n",
+        "   CASE\n",
+        "        WHEN (transaction_qty * unit_price) >= 5.00 THEN 'High Sale'\n",
+        "        WHEN (transaction_qty * unit_price) >= 3.00 THEN 'Medium Sale'\n",
+        "        ELSE 'Low Sale'\n",
+        "    END AS sales_category,\n",
+        "\n",
+        "CASE\n",
+        "        WHEN DAYOFWEEK(transaction_date) IN (1,7)\n",
+        "        THEN 'Weekend'\n",
+        "        ELSE 'Weekday'\n",
+        "        END AS Day_Classification\n",
+        "\n",
+        "\n",
+        "\n",
+        "        FROM `workspace`.`default`.`bright_coffee_shop`\n",
+        "      GROUP BY ALL  \n",
+        "\n",
+        ")\n",
+        "\n",
+        "\n",
+        "-- BIG CLEANED DATA QUERY\n",
+        "SELECT \n",
+        "transaction_id,\n",
+        "transaction_date, \n",
+        "transaction_time,\n",
+        "day_name,\n",
+        "transaction_hour,\n",
+        "day_of_week,\n",
+        "month_name,\n",
+        "formatted_time,\n",
+        "time_of_day,\n",
+        "transaction_qty,\n",
+        "store_id,\n",
+        "store_location,\n",
+        "product_id,\n",
+        "unit_price,\n",
+        "product_category,\n",
+        "product_type,\n",
+        "product_detail, \n",
+        "sales_category,\n",
+        "day_classification,\n",
+        "transaction_qty* unit_price AS sales,\n",
+        "SUM (transaction_qty* unit_price) AS total_revenue\n",
+        "FROM CTE\n",
+        "GROUP BY ALL;\n",
+        "       \n"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "dc47a9b7",
+      "displayName": "Untitled Page",
+      "layout": [
+        {
+          "widget": {
+            "name": "df1ad9f2",
+            "queries": [
+              {
+                "name": "ca10433be1d24dd0bb028409f4b1de92",
+                "query": {
+                  "datasetName": "6edca260",
+                  "fields": [
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "column_f1c6f623169",
+                      "expression": "SUM(`total_revenue`)"
+                    },
+                    {
+                      "name": "day_classification",
+                      "expression": "`day_classification`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "Revenue by Product Category per Day Cassification",
+                "viz_type": "CHART",
+                "serialized_options": "{\"isAggregationOn\":true,\"series\":{\"error_y\":{\"type\":\"data\",\"visible\":true},\"stacking\":null},\"coefficient\":1,\"yAxis\":[{\"type\":\"-\"},{\"opposite\":true,\"type\":\"-\"}],\"columnConfigurationMap\":{\"series\":{\"column\":\"day_classification\",\"id\":\"column_f1c6f623175\"},\"x\":{\"column\":\"product_category\",\"id\":\"column_f1c6f623167\"},\"y\":[{\"column\":\"total_revenue\",\"id\":\"column_f1c6f623169\",\"transform\":\"SUM\"}]},\"alignYAxesAtZero\":true,\"direction\":{\"type\":\"counterclockwise\"},\"swappedAxes\":false,\"percentFormat\":\"0[.]00%\",\"textFormat\":\"\",\"legend\":{\"traceorder\":\"normal\"},\"globalSeriesType\":\"column\",\"version\":2,\"sizemode\":\"diameter\",\"seriesOptions\":{\"column_f1c6f623169\":{\"type\":\"column\",\"yAxis\":0}},\"error_y\":{\"type\":\"data\",\"visible\":true},\"sortX\":true,\"showDataLabels\":false,\"missingValuesAsZero\":true,\"useAggregationsUi\":true,\"numberFormat\":\"0,0.[00000]\",\"dateTimeFormat\":\"DD/MM/YYYY HH:mm\",\"sortY\":true,\"valuesOptions\":{},\"xAxis\":{\"labels\":{\"enabled\":true},\"type\":\"-\"}}",
+                "query_name": "ca10433be1d24dd0bb028409f4b1de92"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "0f3c720a",
+            "queries": [
+              {
+                "name": "ca10433be1d24dd0bb028409f4b1de92",
+                "query": {
+                  "datasetName": "6edca260",
+                  "fields": [
+                    {
+                      "name": "store_location",
+                      "expression": "`store_location`"
+                    },
+                    {
+                      "name": "column_f1c6f62382",
+                      "expression": "SUM(`total_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "Store Location Revenue",
+                "viz_type": "CHART",
+                "serialized_options": "{\"isAggregationOn\":true,\"series\":{\"error_y\":{\"type\":\"data\",\"visible\":true},\"stacking\":null},\"coefficient\":1,\"yAxis\":[{\"type\":\"-\"},{\"opposite\":true,\"type\":\"-\"}],\"columnConfigurationMap\":{\"x\":{\"column\":\"store_location\",\"id\":\"column_f1c6f62387\"},\"y\":[{\"column\":\"total_revenue\",\"id\":\"column_f1c6f62382\",\"transform\":\"SUM\"}]},\"alignYAxesAtZero\":true,\"direction\":{\"type\":\"counterclockwise\"},\"swappedAxes\":false,\"percentFormat\":\"0[.]00%\",\"textFormat\":\"\",\"legend\":{\"traceorder\":\"normal\"},\"globalSeriesType\":\"pie\",\"version\":2,\"sizemode\":\"diameter\",\"seriesOptions\":{\"column_f1c6f62382\":{\"type\":\"pie\",\"yAxis\":0}},\"error_y\":{\"type\":\"data\",\"visible\":true},\"sortX\":true,\"showDataLabels\":true,\"missingValuesAsZero\":true,\"useAggregationsUi\":true,\"numberFormat\":\"0,0.[00000]\",\"dateTimeFormat\":\"DD/MM/YYYY HH:mm\",\"sortY\":true,\"valuesOptions\":{},\"xAxis\":{\"labels\":{\"enabled\":true},\"type\":\"-\"}}",
+                "query_name": "ca10433be1d24dd0bb028409f4b1de92"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "da136555",
+            "queries": [
+              {
+                "name": "ca10433be1d24dd0bb028409f4b1de92",
+                "query": {
+                  "datasetName": "6edca260",
+                  "fields": [
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "column_f1c6f62390",
+                      "expression": "SUM(`total_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "Revenue Per Product Category",
+                "viz_type": "CHART",
+                "serialized_options": "{\"isAggregationOn\":true,\"series\":{\"error_y\":{\"type\":\"data\",\"visible\":true},\"stacking\":null},\"coefficient\":1,\"yAxis\":[{\"type\":\"-\"},{\"opposite\":true,\"type\":\"-\"}],\"columnConfigurationMap\":{\"x\":{\"column\":\"product_category\",\"id\":\"column_f1c6f62392\"},\"y\":[{\"column\":\"total_revenue\",\"id\":\"column_f1c6f62390\",\"transform\":\"SUM\"}]},\"alignYAxesAtZero\":true,\"direction\":{\"type\":\"counterclockwise\"},\"swappedAxes\":false,\"percentFormat\":\"0[.]00%\",\"textFormat\":\"\",\"legend\":{\"traceorder\":\"normal\"},\"globalSeriesType\":\"column\",\"version\":2,\"sizemode\":\"diameter\",\"seriesOptions\":{\"column_f1c6f62390\":{\"type\":\"column\",\"yAxis\":0}},\"error_y\":{\"type\":\"data\",\"visible\":true},\"sortX\":true,\"showDataLabels\":false,\"missingValuesAsZero\":true,\"useAggregationsUi\":true,\"numberFormat\":\"0,0.[00000]\",\"dateTimeFormat\":\"DD/MM/YYYY HH:mm\",\"sortY\":true,\"valuesOptions\":{},\"xAxis\":{\"labels\":{\"enabled\":true},\"type\":\"-\"}}",
+                "query_name": "ca10433be1d24dd0bb028409f4b1de92"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "25d6a52b",
+            "queries": [
+              {
+                "name": "ca10433be1d24dd0bb028409f4b1de92",
+                "query": {
+                  "datasetName": "6edca260",
+                  "fields": [
+                    {
+                      "name": "product_type",
+                      "expression": "`product_type`"
+                    },
+                    {
+                      "name": "column_f1c6f623117",
+                      "expression": "SUM(`total_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "Revenue per Product Type",
+                "viz_type": "CHART",
+                "serialized_options": "{\"isAggregationOn\":true,\"series\":{\"error_y\":{\"type\":\"data\",\"visible\":true},\"stacking\":null},\"coefficient\":1,\"yAxis\":[{\"type\":\"-\"},{\"opposite\":true,\"type\":\"-\"}],\"columnConfigurationMap\":{\"x\":{\"column\":\"product_type\",\"id\":\"column_f1c6f623115\"},\"y\":[{\"column\":\"total_revenue\",\"id\":\"column_f1c6f623117\",\"transform\":\"SUM\"}]},\"alignYAxesAtZero\":true,\"direction\":{\"type\":\"counterclockwise\"},\"swappedAxes\":false,\"percentFormat\":\"0[.]00%\",\"textFormat\":\"\",\"legend\":{\"traceorder\":\"normal\"},\"globalSeriesType\":\"column\",\"version\":2,\"sizemode\":\"diameter\",\"seriesOptions\":{\"column_f1c6f623117\":{\"type\":\"column\",\"yAxis\":0}},\"error_y\":{\"type\":\"data\",\"visible\":true},\"sortX\":true,\"showDataLabels\":false,\"missingValuesAsZero\":true,\"useAggregationsUi\":true,\"numberFormat\":\"0,0.[00000]\",\"dateTimeFormat\":\"DD/MM/YYYY HH:mm\",\"sortY\":true,\"valuesOptions\":{},\"xAxis\":{\"labels\":{\"enabled\":true},\"type\":\"-\"}}",
+                "query_name": "ca10433be1d24dd0bb028409f4b1de92"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 6,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "a18d104f",
+            "queries": [
+              {
+                "name": "ca10433be1d24dd0bb028409f4b1de92",
+                "query": {
+                  "datasetName": "6edca260",
+                  "fields": [
+                    {
+                      "name": "sales_category",
+                      "expression": "`sales_category`"
+                    },
+                    {
+                      "name": "column_f1c6f623153",
+                      "expression": "SUM(`total_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "Sales Category/ Revenue Split",
+                "viz_type": "CHART",
+                "serialized_options": "{\"isAggregationOn\":true,\"series\":{\"error_y\":{\"type\":\"data\",\"visible\":true},\"stacking\":null},\"coefficient\":1,\"yAxis\":[{\"type\":\"-\"},{\"opposite\":true,\"type\":\"-\"}],\"columnConfigurationMap\":{\"x\":{\"column\":\"sales_category\",\"id\":\"column_f1c6f623151\"},\"y\":[{\"column\":\"total_revenue\",\"id\":\"column_f1c6f623153\",\"transform\":\"SUM\"}]},\"alignYAxesAtZero\":true,\"direction\":{\"type\":\"counterclockwise\"},\"swappedAxes\":false,\"percentFormat\":\"0[.]00%\",\"textFormat\":\"\",\"legend\":{\"traceorder\":\"normal\"},\"globalSeriesType\":\"pie\",\"version\":2,\"sizemode\":\"diameter\",\"seriesOptions\":{\"column_f1c6f623153\":{\"type\":\"pie\",\"yAxis\":0}},\"error_y\":{\"type\":\"data\",\"visible\":true},\"sortX\":true,\"showDataLabels\":true,\"missingValuesAsZero\":true,\"useAggregationsUi\":true,\"numberFormat\":\"0,0.[00000]\",\"dateTimeFormat\":\"DD/MM/YYYY HH:mm\",\"sortY\":true,\"valuesOptions\":{},\"xAxis\":{\"labels\":{\"enabled\":true},\"type\":\"-\"}}",
+                "query_name": "ca10433be1d24dd0bb028409f4b1de92"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 12,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "d6d52b37",
+            "queries": [
+              {
+                "name": "ca10433be1d24dd0bb028409f4b1de92",
+                "query": {
+                  "datasetName": "6edca260",
+                  "fields": [
+                    {
+                      "name": "transaction_hour",
+                      "expression": "`transaction_hour`"
+                    },
+                    {
+                      "name": "column_47f192c168",
+                      "expression": "SUM(`total_revenue`)"
+                    },
+                    {
+                      "name": "store_location",
+                      "expression": "`store_location`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "Hourly Revenue Per Store",
+                "viz_type": "CHART",
+                "serialized_options": "{\"isAggregationOn\":true,\"series\":{\"error_y\":{\"type\":\"data\",\"visible\":true},\"stacking\":null},\"coefficient\":1,\"yAxis\":[{\"type\":\"-\"},{\"opposite\":true,\"type\":\"-\"}],\"columnConfigurationMap\":{\"series\":{\"column\":\"store_location\",\"id\":\"column_f4d47d38273\"},\"x\":{\"column\":\"transaction_hour\",\"id\":\"column_47f192c166\"},\"y\":[{\"column\":\"total_revenue\",\"id\":\"column_47f192c168\",\"transform\":\"SUM\"}]},\"alignYAxesAtZero\":true,\"direction\":{\"type\":\"counterclockwise\"},\"swappedAxes\":false,\"percentFormat\":\"0[.]00%\",\"textFormat\":\"\",\"legend\":{\"traceorder\":\"normal\"},\"globalSeriesType\":\"column\",\"version\":2,\"sizemode\":\"diameter\",\"seriesOptions\":{\"column_47f192c168\":{\"type\":\"column\",\"yAxis\":0}},\"error_y\":{\"type\":\"data\",\"visible\":true},\"sortX\":true,\"showDataLabels\":false,\"missingValuesAsZero\":true,\"useAggregationsUi\":true,\"numberFormat\":\"0,0.[00000]\",\"dateTimeFormat\":\"DD/MM/YYYY HH:mm\",\"sortY\":true,\"valuesOptions\":{},\"xAxis\":{\"labels\":{\"enabled\":true},\"type\":\"-\"}}",
+                "query_name": "ca10433be1d24dd0bb028409f4b1de92"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 12,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "afd69f7a",
+            "queries": [
+              {
+                "name": "ca10433be1d24dd0bb028409f4b1de92",
+                "query": {
+                  "datasetName": "6edca260",
+                  "fields": [
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "column_f4d47d38302",
+                      "expression": "SUM(`total_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "Revenue per Product Category",
+                "viz_type": "CHART",
+                "serialized_options": "{\"isAggregationOn\":true,\"series\":{\"error_y\":{\"type\":\"data\",\"visible\":true},\"stacking\":null},\"coefficient\":1,\"yAxis\":[{\"type\":\"-\"},{\"opposite\":true,\"type\":\"-\"}],\"columnConfigurationMap\":{\"x\":{\"column\":\"product_category\",\"id\":\"column_f4d47d38300\"},\"y\":[{\"column\":\"total_revenue\",\"id\":\"column_f4d47d38302\",\"transform\":\"SUM\"}]},\"alignYAxesAtZero\":true,\"direction\":{\"type\":\"counterclockwise\"},\"swappedAxes\":false,\"percentFormat\":\"0[.]00%\",\"textFormat\":\"\",\"legend\":{\"traceorder\":\"normal\"},\"globalSeriesType\":\"column\",\"version\":2,\"sizemode\":\"diameter\",\"seriesOptions\":{\"column_f4d47d38302\":{\"type\":\"column\",\"yAxis\":0}},\"error_y\":{\"type\":\"data\",\"visible\":true},\"sortX\":true,\"showDataLabels\":false,\"missingValuesAsZero\":true,\"useAggregationsUi\":true,\"numberFormat\":\"0,0.[00000]\",\"dateTimeFormat\":\"DD/MM/YYYY HH:mm\",\"sortY\":true,\"valuesOptions\":{},\"xAxis\":{\"labels\":{\"enabled\":true},\"type\":\"-\"}}",
+                "query_name": "ca10433be1d24dd0bb028409f4b1de92"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 18,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "d6413601",
+            "queries": [
+              {
+                "name": "ca10433be1d24dd0bb028409f4b1de92",
+                "query": {
+                  "datasetName": "6edca260",
+                  "fields": [
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "column_f4d47d38287",
+                      "expression": "SUM(`unit_price`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "Unit Price Per Product Category",
+                "viz_type": "CHART",
+                "serialized_options": "{\"isAggregationOn\":true,\"series\":{\"error_y\":{\"type\":\"data\",\"visible\":true},\"stacking\":null},\"coefficient\":1,\"yAxis\":[{\"type\":\"-\"},{\"opposite\":true,\"type\":\"-\"}],\"columnConfigurationMap\":{\"x\":{\"column\":\"product_category\",\"id\":\"column_f4d47d38289\"},\"y\":[{\"column\":\"unit_price\",\"id\":\"column_f4d47d38287\",\"transform\":\"SUM\"}]},\"alignYAxesAtZero\":true,\"direction\":{\"type\":\"counterclockwise\"},\"swappedAxes\":false,\"percentFormat\":\"0[.]00%\",\"textFormat\":\"\",\"legend\":{\"traceorder\":\"normal\"},\"globalSeriesType\":\"column\",\"version\":2,\"sizemode\":\"diameter\",\"seriesOptions\":{\"column_f4d47d38287\":{\"type\":\"column\",\"yAxis\":0}},\"error_y\":{\"type\":\"data\",\"visible\":true},\"sortX\":true,\"showDataLabels\":false,\"missingValuesAsZero\":true,\"useAggregationsUi\":true,\"numberFormat\":\"0,0.[00000]\",\"dateTimeFormat\":\"DD/MM/YYYY HH:mm\",\"sortY\":true,\"valuesOptions\":{},\"xAxis\":{\"labels\":{\"enabled\":true},\"type\":\"-\"}}",
+                "query_name": "ca10433be1d24dd0bb028409f4b1de92"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 18,
+            "width": 3,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
